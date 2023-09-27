@@ -1,5 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <stdexcept>
+#include <array>
+
 using namespace std;
 
 class ParkingSpot
@@ -45,7 +49,21 @@ public:
             {
                 int occupancy_status;
                 file >> occupancy_status;
-                lot[i][j] = new ParkingSpot('S', occupancy_status); // Initialize with ParkingSpot objects
+
+                char size;
+                if (j >= 0 && j <= 3)
+                {
+                    size = 'S';
+                }
+                else if (j >= 4 && j <= 6)
+                {
+                    size = 'M';
+                }
+                else
+                {
+                    size = 'L';
+                }
+                lot[i][j] = new ParkingSpot(size, occupancy_status); // Initialize with ParkingSpot objects
             }
         }
 
@@ -62,6 +80,25 @@ public:
             }
             cout << endl;
         }
+    }
+
+    // Function to filter empty spots based on vehicle size and store them in a vector of arrays of length 2
+    vector<array<int, 2> >  filterEmptySpots(char vehicleSize)
+    {
+        vector<array<int, 2> > emptySpots;
+
+        for (int i = 0; i < rows; ++i)
+        {
+            for (int j = 0; j < columns; ++j)
+            {
+                if (lot[i][j]->occupied == 0 && lot[i][j]->size == vehicleSize)
+                {
+                    array<int, 2> coords = {i, j};
+                    emptySpots.push_back(coords);
+                }
+            }
+        }
+        return emptySpots;
     }
 
     // Destructor to write occupancy status to a file
@@ -110,6 +147,21 @@ int main()
         parkingLot.lot[1][9]->occupied = 1; // Set as occupied (1)
         parkingLot.lot[9][9]->occupied = 0; // Set as unoccupied (0)
         parkingLot.printSpotSizes();
+
+        // Take user input for vehicle size
+        char vehicleSize;
+        cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
+        cin >> vehicleSize;
+
+        // Filter empty spots based on vehicle size
+        vector<array<int, 2> > emptySpots = parkingLot.filterEmptySpots(vehicleSize);
+
+        // Display the filtered empty spots
+        cout << "Empty spots for your vehicle size:" << endl;
+        for (size_t i = 0; i < emptySpots.size(); ++i)
+        {
+            cout << "Row: " << emptySpots[i][0] << ", Column: " << emptySpots[i][1] << endl;
+        }
     }
     catch (const exception &e)
     {
@@ -118,3 +170,4 @@ int main()
 
     return 0;
 }
+ 
