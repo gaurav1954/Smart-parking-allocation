@@ -58,10 +58,10 @@ public:
         columns = 10; // You can adjust this based on your file structure
 
         lot = new ParkingSpot **[rows];
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
             lot[i] = new ParkingSpot *[columns];
-            for (int j = 0; j < columns; ++j)
+            for (int j = 0; j < columns; j++)
             {
                 int occupancy_status;
                 file >> occupancy_status;
@@ -88,9 +88,9 @@ public:
 
     void printSpotSizes()
     {
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < columns; ++j)
+            for (int j = 0; j < columns; j++)
             {
                 cout << lot[i][j]->occupied;
             }
@@ -103,9 +103,9 @@ public:
     {
         vector<array<int, 2>> emptySpots;
 
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < columns; ++j)
+            for (int j = 0; j < columns; j++)
             {
                 if (lot[i][j]->occupied == 0 && lot[i][j]->size == vehicleSize)
                 {
@@ -141,7 +141,7 @@ public:
             return emptySpots;
         }
 
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
             int left = 0;
             int right = columns - 1;
@@ -171,7 +171,7 @@ public:
                     }
                     break;
                 }
-                else if (lot[i][mid]->priority < vehiclePriority)
+                else if (lot[i][mid]->priority <= vehiclePriority)
                 {
                     left = mid + 1; // Search the right half
                 }
@@ -195,9 +195,9 @@ public:
             return;
         }
 
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < columns; ++j)
+            for (int j = 0; j < columns; j++)
             {
                 file << lot[i][j]->occupied << ' ';
             }
@@ -208,9 +208,9 @@ public:
         cout << "Occupancy status written to file before destruction." << endl;
 
         // Deallocate memory
-        for (int i = 0; i < rows; ++i)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < columns; ++j)
+            for (int j = 0; j < columns; j++)
             {
                 delete lot[i][j];
             }
@@ -303,9 +303,9 @@ int main()
         auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
         cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
 
-        // Display the nearest spot
+        // // Display the nearest spot
         cout << "Nearest empty spot for your vehicle size:" << endl;
-        cout << "Row: " << nearestSpotBinary[0] << ", Column: " << nearestSpotBinary[1] << endl;
+        cout << "Row: " << nearestSpotLinear[0] << ", Column: " << nearestSpotLinear[1] << endl;
     }
     catch (const exception &e)
     {
