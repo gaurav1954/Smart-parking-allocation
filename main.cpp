@@ -3,6 +3,9 @@
 #include <vector>
 #include <stdexcept>
 #include <array>
+#include <climits>
+#include <cmath>
+#include <queue>
 
 using namespace std;
 
@@ -17,7 +20,7 @@ public:
     {
         this->size = s;
         this->occupied = o;
-         if (s == 'S')
+        if (s == 'S')
         {
             priority = 1;
         }
@@ -96,9 +99,9 @@ public:
     }
 
     // linear searchs
-    vector<array<int, 2> >  filterEmptySpots(char vehicleSize)
+    vector<array<int, 2>> filterEmptySpots(char vehicleSize)
     {
-        vector<array<int, 2> > emptySpots;
+        vector<array<int, 2>> emptySpots;
 
         for (int i = 0; i < rows; ++i)
         {
@@ -114,10 +117,10 @@ public:
         return emptySpots;
     }
 
-//binary serach
-vector<array<int, 2> > filterEmptySpotsBinarySearch(char vehicleSize)
+    // binary serach
+    vector<array<int, 2>> filterEmptySpotsBinarySearch(char vehicleSize)
     {
-        vector<array<int, 2> > emptySpots;
+        vector<array<int, 2>> emptySpots;
 
         int vehiclePriority;
         if (vehicleSize == 'S')
@@ -152,20 +155,21 @@ vector<array<int, 2> > filterEmptySpotsBinarySearch(char vehicleSize)
                     array<int, 2> coords = {i, mid};
                     emptySpots.push_back(coords);
 
-                    int tleft=mid-1;
-                    while (tleft >= 0 &&lot[i][tleft]->size == vehicleSize && lot[i][tleft]->occupied == 0) {
+                    int tleft = mid - 1;
+                    while (tleft >= 0 && lot[i][tleft]->size == vehicleSize && lot[i][tleft]->occupied == 0)
+                    {
                         array<int, 2> coords = {i, tleft};
                         emptySpots.push_back(coords);
                         tleft--;
                     }
-                    int tright=mid+1;
-                    while (tright <10 &&lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0) {
+                    int tright = mid + 1;
+                    while (tright < 10 && lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0)
+                    {
                         array<int, 2> coords = {i, tright};
                         emptySpots.push_back(coords);
                         tright++;
                     }
                     break;
-
                 }
                 else if (lot[i][mid]->priority < vehiclePriority)
                 {
@@ -216,6 +220,56 @@ vector<array<int, 2> > filterEmptySpotsBinarySearch(char vehicleSize)
     }
 };
 
+int manhattanDistance(const array<int, 2> &spot1, const array<int, 2> &spot2)
+{
+    return abs(spot1[0] - spot2[0]) + abs(spot1[1] - spot2[1]);
+}
+
+// Function to find the nearest spot using Dijkstra's algorithm
+array<int, 2> findNearestSpot(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
+{
+    // Create a priority queue for Dijkstra's algorithm
+    priority_queue<pair<int, array<int, 2>>> pq;
+    vector<vector<int>> distance(10, vector<int>(10, INT_MAX));
+
+    // Initialize the distance for the entrance
+    distance[entrance[0]][entrance[1]] = 0;
+    pq.push({0, entrance});
+
+    // Dijkstra's algorithm to find the nearest spot
+    while (!pq.empty())
+    {
+        array<int, 2> current = pq.top().second;
+        pq.pop();
+
+        for (const auto &spot : emptySpots)
+        {
+            int newDistance = distance[current[0]][current[1]] + manhattanDistance(current, spot);
+
+            if (newDistance < distance[spot[0]][spot[1]])
+            {
+                distance[spot[0]][spot[1]] = newDistance;
+                pq.push({-newDistance, spot});
+            }
+        }
+    }
+
+    // Find the nearest spot
+    int minDistance = INT_MAX;
+    array<int, 2> nearestSpot;
+
+    for (const auto &spot : emptySpots)
+    {
+        if (distance[spot[0]][spot[1]] < minDistance)
+        {
+            minDistance = distance[spot[0]][spot[1]];
+            nearestSpot = spot;
+        }
+    }
+
+    return nearestSpot;
+}
+
 int main()
 {
     try
@@ -230,15 +284,18 @@ int main()
         cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
         cin >> vehicleSize;
 
-        // Filter empty spots based on vehicle size
-        vector<array<int, 2> > emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+        // Filter empty spots based on vehicle size using binary search
+        vector<array<int, 2>> emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
 
-        // Display the filtered empty spots
-        cout << "Empty spots for your vehicle size:" << endl;
-        for (size_t i = 0; i < emptySpots.size(); ++i)
-        {
-            cout << "Row: " << emptySpots[i][0] << ", Column: " << emptySpots[i][1] << endl;
-        }
+        // Assuming entrance is at row 0, column 0 (you can change this as needed)
+        array<int, 2> entrance = {0, 0};
+
+        // Find the nearest spot using the function
+        array<int, 2> nearestSpot = findNearestSpot(emptySpots, entrance);
+
+        // Display the nearest spot
+        cout << "Nearest empty spot for your vehicle size:" << endl;
+        cout << "Row: " << nearestSpot[0] << ", Column: " << nearestSpot[1] << endl;
     }
     catch (const exception &e)
     {
@@ -247,4 +304,3 @@ int main()
 
     return 0;
 }
- 
