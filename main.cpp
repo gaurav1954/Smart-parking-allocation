@@ -95,7 +95,7 @@ public:
         }
     }
 
-    // Function to filter empty spots based on vehicle size and store them in a vector of arrays of length 2
+    // linear searchs
     vector<array<int, 2> >  filterEmptySpots(char vehicleSize)
     {
         vector<array<int, 2> > emptySpots;
@@ -114,10 +114,7 @@ public:
         return emptySpots;
     }
 
-// binary search wil be used to find first index of required size in each row and then find out each vacant index
-// Function to filter empty spots based on vehicle size using binary search in each row
-// Inside filterEmptySpotsBinarySearch function
-// Add debugging output to trace the binary search
+//binary serach
 vector<array<int, 2> > filterEmptySpotsBinarySearch(char vehicleSize)
     {
         vector<array<int, 2> > emptySpots;
