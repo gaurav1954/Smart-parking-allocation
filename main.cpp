@@ -223,9 +223,6 @@ int main()
         // Create a 10x10 parking lot with occupancy status read from the file
         ParkingLot parkingLot;
 
-        // Modify the occupancy status
-        parkingLot.lot[1][9]->occupied = 1; // Set as occupied (1)
-        parkingLot.lot[9][9]->occupied = 0; // Set as unoccupied (0)
         parkingLot.printSpotSizes();
 
         // Take user input for vehicle size
