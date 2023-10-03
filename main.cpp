@@ -154,7 +154,21 @@ vector<array<int, 2> > filterEmptySpotsBinarySearch(char vehicleSize)
                 {
                     array<int, 2> coords = {i, mid};
                     emptySpots.push_back(coords);
-                    break; // Exit the while loop
+
+                    int tleft=mid-1;
+                    while (tleft >= 0 &&lot[i][tleft]->size == vehicleSize && lot[i][tleft]->occupied == 0) {
+                        array<int, 2> coords = {i, tleft};
+                        emptySpots.push_back(coords);
+                        tleft--;
+                    }
+                    int tright=mid+1;
+                    while (tright <10 &&lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0) {
+                        array<int, 2> coords = {i, tright};
+                        emptySpots.push_back(coords);
+                        tright++;
+                    }
+                    break;
+
                 }
                 else if (lot[i][mid]->priority < vehiclePriority)
                 {
