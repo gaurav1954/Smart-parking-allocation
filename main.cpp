@@ -283,19 +283,29 @@ int main()
         char vehicleSize;
         cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
         cin >> vehicleSize;
-
-        // Filter empty spots based on vehicle size using binary search
-        vector<array<int, 2>> emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
-
-        // Assuming entrance is at row 0, column 0 (you can change this as needed)
         array<int, 2> entrance = {0, 0};
 
-        // Find the nearest spot using the function
-        array<int, 2> nearestSpot = findNearestSpot(emptySpots, entrance);
+        auto start = chrono::high_resolution_clock::now();
+        vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+        array<int, 2> nearestSpotBinary = findNearestSpot(emptySpotsBinary, entrance);
+        auto end = chrono::high_resolution_clock::now();
+        auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
+
+        cout << "Nearest empty spot for your vehicle size:" << endl;
+        cout << "Row: " << nearestSpotBinary[0] << ", Column: " << nearestSpotBinary[1] << endl;
+
+        // Measure time for the linear search approach
+        start = chrono::high_resolution_clock::now();
+        vector<array<int, 2>> emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
+        array<int, 2> nearestSpotLinear = findNearestSpot(emptySpotsLinear, entrance);
+        end = chrono::high_resolution_clock::now();
+        auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
+        cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
 
         // Display the nearest spot
         cout << "Nearest empty spot for your vehicle size:" << endl;
-        cout << "Row: " << nearestSpot[0] << ", Column: " << nearestSpot[1] << endl;
+        cout << "Row: " << nearestSpotBinary[0] << ", Column: " << nearestSpotBinary[1] << endl;
     }
     catch (const exception &e)
     {
