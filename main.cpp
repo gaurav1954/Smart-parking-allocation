@@ -97,6 +97,18 @@ public:
             cout << endl;
         }
     }
+    // to mark to spot as occupied
+    void occupySpot(int row, int col)
+    {
+        if (row >= 0 && row < rows && col >= 0 && col < columns)
+        {
+            lot[row][col]->occupied = 1;
+        }
+        else
+        {
+            cerr << "Invalid spot coordinates." << endl;
+        }
+    }
 
     // linear searchs
     vector<array<int, 2>> filterEmptySpots(char vehicleSize)
@@ -115,6 +127,28 @@ public:
             }
         }
         return emptySpots;
+    }
+    // save to file
+    void saveOccupancyStatusToFile()
+    {
+        ofstream file("occupancy.txt"); // Open a file for writing
+        if (!file)
+        {
+            cerr << "Error opening file for writing." << endl;
+            return;
+        }
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < columns; j++)
+            {
+                file << lot[i][j]->occupied << ' ';
+            }
+            file << endl;
+        }
+
+        file.close(); // Close the file
+        cout << "Occupancy status written to file." << endl;
     }
 
     // binary serach
@@ -188,25 +222,6 @@ public:
     // Destructor to write occupancy status to a file
     ~ParkingLot()
     {
-        ofstream file("occupancy.txt"); // Open a file for writing
-        if (!file)
-        {
-            cerr << "Error opening file for writing." << endl;
-            return;
-        }
-
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < columns; j++)
-            {
-                file << lot[i][j]->occupied << ' ';
-            }
-            file << endl;
-        }
-
-        file.close(); // Close the file
-        cout << "Occupancy status written to file before destruction." << endl;
-
         // Deallocate memory
         for (int i = 0; i < rows; i++)
         {
@@ -270,47 +285,62 @@ array<int, 2> findNearestSpot(const vector<array<int, 2>> &emptySpots, const arr
     return nearestSpot;
 }
 
+class ParkingLotManager
+{
+public:
+    // Member function to encapsulate your main logic
+    void run()
+    {
+        try
+        {
+            // Create a 10x10 parking lot with occupancy status read from the file
+            ParkingLot parkingLot;
+
+            parkingLot.printSpotSizes();
+
+            // Take user input for vehicle size
+            char vehicleSize;
+            cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
+            cin >> vehicleSize;
+            array<int, 2> entrance = {0, 0};
+
+            auto start = chrono::high_resolution_clock::now();
+            vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            array<int, 2> nearestSpotBinary = findNearestSpot(emptySpotsBinary, entrance);
+            auto end = chrono::high_resolution_clock::now();
+            auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
+            cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
+
+            cout << "Nearest empty spot for your vehicle size:" << endl;
+            cout << "Row: " << nearestSpotBinary[0] + 1 << ", Column: " << nearestSpotBinary[1] + 1 << endl;
+
+            // Measure time for the linear search approach
+            start = chrono::high_resolution_clock::now();
+            vector<array<int, 2>> emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
+            array<int, 2> nearestSpotLinear = findNearestSpot(emptySpotsLinear, entrance);
+            end = chrono::high_resolution_clock::now();
+            auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
+            cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
+
+            // // Display the nearest spot
+            cout << "Nearest empty spot for your vehicle size:" << endl;
+            cout << "Row: " << nearestSpotLinear[0] + 1 << ", Column: " << nearestSpotLinear[1] + 1 << endl;
+
+            parkingLot.occupySpot(nearestSpotLinear[0], nearestSpotLinear[1]);
+            parkingLot.saveOccupancyStatusToFile();
+        }
+        catch (const exception &e)
+        {
+            cerr << "Error: " << e.what() << endl;
+        }
+    }
+};
+
 int main()
 {
-    try
-    {
-        // Create a 10x10 parking lot with occupancy status read from the file
-        ParkingLot parkingLot;
-
-        parkingLot.printSpotSizes();
-
-        // Take user input for vehicle size
-        char vehicleSize;
-        cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
-        cin >> vehicleSize;
-        array<int, 2> entrance = {0, 0};
-
-        auto start = chrono::high_resolution_clock::now();
-        vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
-        array<int, 2> nearestSpotBinary = findNearestSpot(emptySpotsBinary, entrance);
-        auto end = chrono::high_resolution_clock::now();
-        auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
-        cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
-
-        cout << "Nearest empty spot for your vehicle size:" << endl;
-        cout << "Row: " << nearestSpotBinary[0] << ", Column: " << nearestSpotBinary[1] << endl;
-
-        // Measure time for the linear search approach
-        start = chrono::high_resolution_clock::now();
-        vector<array<int, 2>> emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
-        array<int, 2> nearestSpotLinear = findNearestSpot(emptySpotsLinear, entrance);
-        end = chrono::high_resolution_clock::now();
-        auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
-        cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
-
-        // // Display the nearest spot
-        cout << "Nearest empty spot for your vehicle size:" << endl;
-        cout << "Row: " << nearestSpotLinear[0] << ", Column: " << nearestSpotLinear[1] << endl;
-    }
-    catch (const exception &e)
-    {
-        cerr << "Error: " << e.what() << endl;
-    }
+    // Instantiate ParkingLotManager and run the main logic
+    ParkingLotManager manager;
+    manager.run();
 
     return 0;
 }
