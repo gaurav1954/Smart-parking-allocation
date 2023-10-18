@@ -241,7 +241,7 @@ int manhattanDistance(const array<int, 2> &spot1, const array<int, 2> &spot2)
 }
 
 // Function to find the nearest spot using Dijkstra's algorithm
-array<int, 2> findNearestSpot(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
+array<int, 2> findNearestSpotUsingDijkastras(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
 {
     // Create a priority queue for Dijkstra's algorithm
     priority_queue<pair<int, array<int, 2>>> pq;
@@ -345,11 +345,12 @@ public:
             cin >> vehicleSize;
             array<int, 2> entrance = {0, 0};
 
+            cout << endl;
             cout << "using dijkastras" << endl;
             // binary search
             auto start = chrono::high_resolution_clock::now();
             vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
-            array<int, 2> nearestSpotBinary = findNearestSpot(emptySpotsBinary, entrance);
+            array<int, 2> nearestSpotBinary = findNearestSpotUsingDijkastras(emptySpotsBinary, entrance);
             auto end = chrono::high_resolution_clock::now();
             auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
             cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
@@ -360,7 +361,7 @@ public:
             // Measure time for the linear search approach
             start = chrono::high_resolution_clock::now();
             vector<array<int, 2>> emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
-            array<int, 2> nearestSpotLinear = findNearestSpot(emptySpotsLinear, entrance);
+            array<int, 2> nearestSpotLinear = findNearestSpotUsingDijkastras(emptySpotsLinear, entrance);
             end = chrono::high_resolution_clock::now();
             auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
             cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
@@ -369,6 +370,7 @@ public:
             cout << "Nearest empty spot for your vehicle size:" << endl;
             cout << "Row: " << nearestSpotLinear[0] + 1 << ", Column: " << nearestSpotLinear[1] + 1 << endl;
 
+            cout << endl;
             cout << "Using bellman Ford" << endl;
             // Using binary serach
             start = chrono::high_resolution_clock::now();
