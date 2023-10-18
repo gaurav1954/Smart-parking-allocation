@@ -285,6 +285,47 @@ array<int, 2> findNearestSpot(const vector<array<int, 2>> &emptySpots, const arr
     return nearestSpot;
 }
 
+array<int, 2> findNearestSpotBellmanFord(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
+{
+    vector<vector<int>> distance(10, vector<int>(10, INT_MAX));
+
+    // Initialize the distance for the entrance
+    distance[entrance[0]][entrance[1]] = 0;
+
+    // Apply Bellman-Ford to find the minimum distances
+    for (int k = 0; k < emptySpots.size(); k++)
+    {
+        for (const auto &spot : emptySpots)
+        {
+            int i = spot[0];
+            int j = spot[1];
+            int w = manhattanDistance(spot, entrance);
+
+            if (distance[i][j] > distance[entrance[0]][entrance[1]] + w)
+            {
+                distance[i][j] = distance[entrance[0]][entrance[1]] + w;
+            }
+        }
+    }
+
+    // Find the nearest spot
+    int minDistance = INT_MAX;
+    array<int, 2> nearestSpot;
+
+    for (const auto &spot : emptySpots)
+    {
+        int i = spot[0];
+        int j = spot[1];
+
+        if (distance[i][j] < minDistance)
+        {
+            minDistance = distance[i][j];
+            nearestSpot = spot;
+        }
+    }
+
+    return nearestSpot;
+}
 class ParkingLotManager
 {
 public:
@@ -304,6 +345,8 @@ public:
             cin >> vehicleSize;
             array<int, 2> entrance = {0, 0};
 
+            cout << "using dijkastras" << endl;
+            // binary search
             auto start = chrono::high_resolution_clock::now();
             vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
             array<int, 2> nearestSpotBinary = findNearestSpot(emptySpotsBinary, entrance);
@@ -311,7 +354,7 @@ public:
             auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
             cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
 
-            cout << "Nearest empty spot for your vehicle size:" << endl;
+            cout << "Nearest empty spot for your vehicle size" << endl;
             cout << "Row: " << nearestSpotBinary[0] + 1 << ", Column: " << nearestSpotBinary[1] + 1 << endl;
 
             // Measure time for the linear search approach
@@ -324,6 +367,30 @@ public:
 
             // // Display the nearest spot
             cout << "Nearest empty spot for your vehicle size:" << endl;
+            cout << "Row: " << nearestSpotLinear[0] + 1 << ", Column: " << nearestSpotLinear[1] + 1 << endl;
+
+            cout << "Using bellman Ford" << endl;
+            // Using binary serach
+            start = chrono::high_resolution_clock::now();
+            emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            nearestSpotBinary = findNearestSpotBellmanFord(emptySpotsBinary, entrance);
+            end = chrono::high_resolution_clock::now();
+            durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
+            cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
+
+            cout << "Nearest empty spot for your vehicle size:" << endl;
+            cout << "Row: " << nearestSpotBinary[0] + 1 << ", Column: " << nearestSpotBinary[1] + 1 << endl;
+
+            // using Linear search
+            start = chrono::high_resolution_clock::now();
+            emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
+            nearestSpotLinear = findNearestSpotBellmanFord(emptySpotsLinear, entrance);
+            end = chrono::high_resolution_clock::now();
+            durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
+            cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
+
+            // // Display the nearest spot
+            cout << "Nearest empty spot for your vehicle size" << endl;
             cout << "Row: " << nearestSpotLinear[0] + 1 << ", Column: " << nearestSpotLinear[1] + 1 << endl;
 
             parkingLot.occupySpot(nearestSpotLinear[0], nearestSpotLinear[1]);
