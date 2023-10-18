@@ -88,7 +88,8 @@ public:
 
     void printSpotSizes()
     {
-        cout << "This is the view of parking lot with entry point as 1st row and 1st column" << endl;
+        cout << "\n\nThis is the view of parking lot with entry point as 1st row and 1st column" << endl;
+        cout << "\n All the 1's represent filled spots and all the 0's represent vacant spots" << endl;
         for (int i = 0; i < rows; i++)
         {
             cout << "           ";
@@ -115,6 +116,7 @@ public:
     }
     void printSpotSizesAfterAllocation(array<int, 2> &nearestSpot)
     {
+        cout << "\n\n This is the parking lot with green box as the nearest spot" << endl;
         for (int i = 0; i < rows; i++)
         {
             cout << "           ";
@@ -392,9 +394,6 @@ public:
     {
         try
         {
-            // Create a 15x15 parking lot with occupancy status read from the file
-            parkingLot.printSpotSizes();
-
             array<int, 2> entrance = {0, 0};
 
             // Define table headers
@@ -433,9 +432,6 @@ public:
             }
             cout << "\n\n"
                  << endl;
-            parkingLot.printSpotSizesAfterAllocation(nearestSpot);
-            parkingLot.occupySpot(nearestSpot);
-            parkingLot.saveOccupancyStatusToFile();
         }
         catch (const exception &e)
         {
@@ -482,6 +478,10 @@ public:
              << " and column number "
              << "\x1b[32m" << nearestSpot[1] + 1 << "\x1b[0m "
              << endl;
+        parkingLot.printSpotSizes();
+        parkingLot.printSpotSizesAfterAllocation(nearestSpot);
+        parkingLot.occupySpot(nearestSpot);
+        parkingLot.saveOccupancyStatusToFile();
     }
 };
 
