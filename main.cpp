@@ -167,7 +167,7 @@ public:
     }
 
     // linear searchs
-    vector<array<int, 2>> filterEmptySpots(char vehicleSize)
+    vector<array<int, 2>> filterEmptySpotsUsingLinearSeach(char vehicleSize)
     {
         vector<array<int, 2>> emptySpots;
 
@@ -386,23 +386,20 @@ array<int, 2> findNearestSpotBellmanFord(const vector<array<int, 2>> &emptySpots
 class ParkingLotManager
 {
 public:
+    ParkingLot parkingLot;
     // Member function to encapsulate your main logic
-    void run()
+    void showAnalyticalView(const char &vehicleSize)
     {
         try
         {
             // Create a 15x15 parking lot with occupancy status read from the file
-            ParkingLot parkingLot;
             parkingLot.printSpotSizes();
-            // Take user input for vehicle size
-            char vehicleSize;
-            cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
-            cin >> vehicleSize;
 
             array<int, 2> entrance = {0, 0};
 
             // Define table headers
-            cout << left << setw(15) << "Algorithm" << setw(15) << "Approach" << setw(23) << "Time (microseconds)"
+            cout << "\n\n"
+                 << left << setw(15) << "Algorithm" << setw(15) << "Approach" << setw(23) << "Time (microseconds)"
                  << "Nearest Spot" << endl;
             cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
 
@@ -419,12 +416,12 @@ public:
 
                 if (i < 2)
                 {
-                    emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpots(vehicleSize);
+                    emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
                     nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
                 }
                 else
                 {
-                    emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpots(vehicleSize);
+                    emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
                     nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
                 }
 
@@ -434,7 +431,8 @@ public:
                 cout << setw(15) << algorithms[i] << setw(15) << approaches[i] << setw(23) << duration.count();
                 cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
             }
-
+            cout << "\n\n"
+                 << endl;
             parkingLot.printSpotSizesAfterAllocation(nearestSpot);
             parkingLot.occupySpot(nearestSpot);
             parkingLot.saveOccupancyStatusToFile();
@@ -444,13 +442,58 @@ public:
             cerr << "Error: " << e.what() << endl;
         }
     }
+    void findClosestSpot(const char &vehicleSize)
+    {
+        int option = 0;
+        cout << "Choose a combination to find the closest point" << endl;
+        cout << "1. Dikjkastras with Linear Search" << endl;
+        cout << "2. Dikjkastras with Binary Search" << endl;
+        cout << "3. Bellman Ford with Linear Search" << endl;
+        cout << "4. Bellman Ford with Binary Search" << endl;
+        cout << "Enter your option:";
+        cin >> option;
+        array<int, 2> entrance = {0, 0};
+        vector<array<int, 2>> emptySpots;
+        array<int, 2> nearestSpot;
+        switch (option)
+        {
+        case 1:
+            emptySpots = parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+            nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
+            break;
+        case 2:
+            emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
+            break;
+        case 3:
+            emptySpots = parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+            nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
+            break;
+        case 4:
+            emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
+            break;
+
+        default:
+            cout << "Invalid option. Please select a valid combination." << endl;
+        }
+        cout << "The neares spot is at row number "
+             << "\x1b[32m" << nearestSpot[0] + 1 << "\x1b[0m"
+             << " and column number "
+             << "\x1b[32m" << nearestSpot[1] + 1 << "\x1b[0m "
+             << endl;
+    }
 };
 
 int main()
 {
     // Instantiate ParkingLotManager and run the main logic
     ParkingLotManager manager;
-    manager.run();
+    char vehicleSize;
+    cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
+    cin >> vehicleSize;
+    manager.findClosestSpot(vehicleSize);
+    manager.showAnalyticalView(vehicleSize);
 
     return 0;
 }
