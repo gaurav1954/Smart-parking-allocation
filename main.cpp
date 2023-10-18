@@ -54,8 +54,8 @@ public:
         }
 
         // Read occupancy status and initialize the parking lot
-        rows = 10;    // You can adjust this based on your file structure
-        columns = 10; // You can adjust this based on your file structure
+        rows = 20;    // You can adjust this based on your file structure
+        columns = 20; // You can adjust this based on your file structure
 
         lot = new ParkingSpot **[rows];
         for (int i = 0; i < rows; i++)
@@ -67,11 +67,11 @@ public:
                 file >> occupancy_status;
 
                 char size;
-                if (j >= 0 && j <= 3)
+                if (j >= 0 && j <= 6)
                 {
                     size = 'S';
                 }
-                else if (j >= 4 && j <= 6)
+                else if (j >= 7 && j <= 15)
                 {
                     size = 'M';
                 }
@@ -88,6 +88,7 @@ public:
 
     void printSpotSizes()
     {
+        cout << "This is the view of parking lot with entry point as 1st row and 1st column" << endl;
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
@@ -247,7 +248,7 @@ public:
                         tleft--;
                     }
                     int tright = mid + 1;
-                    while (tright < 10 && lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0)
+                    while (tright < 20 && lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0)
                     {
                         array<int, 2> coords = {i, tright};
                         emptySpots.push_back(coords);
@@ -295,7 +296,7 @@ array<int, 2> findNearestSpotUsingDijkastras(const vector<array<int, 2>> &emptyS
 {
     // Create a priority queue for Dijkstra's algorithm
     priority_queue<pair<int, array<int, 2>>> pq;
-    vector<vector<int>> distance(10, vector<int>(10, INT_MAX));
+    vector<vector<int>> distance(20, vector<int>(20, INT_MAX));
 
     // Initialize the distance for the entrance
     distance[entrance[0]][entrance[1]] = 0;
@@ -337,7 +338,7 @@ array<int, 2> findNearestSpotUsingDijkastras(const vector<array<int, 2>> &emptyS
 
 array<int, 2> findNearestSpotBellmanFord(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
 {
-    vector<vector<int>> distance(10, vector<int>(10, INT_MAX));
+    vector<vector<int>> distance(20, vector<int>(20, INT_MAX));
 
     // Initialize the distance for the entrance
     distance[entrance[0]][entrance[1]] = 0;
@@ -385,68 +386,51 @@ public:
     {
         try
         {
-            // Create a 10x10 parking lot with occupancy status read from the file
+            // Create a 20x20 parking lot with occupancy status read from the file
             ParkingLot parkingLot;
-
             parkingLot.printSpotSizes();
-
             // Take user input for vehicle size
             char vehicleSize;
             cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
             cin >> vehicleSize;
+
             array<int, 2> entrance = {0, 0};
 
-            cout << endl;
-            cout << "using dijkastras" << endl;
-            // binary search
-            auto start = chrono::high_resolution_clock::now();
-            vector<array<int, 2>> emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
-            array<int, 2> nearestSpot = findNearestSpotUsingDijkastras(emptySpotsBinary, entrance);
-            auto end = chrono::high_resolution_clock::now();
-            auto durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
-            cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
+            // Define table headers
+            cout << left << setw(15) << "Algorithm" << setw(15) << "Approach" << setw(23) << "Time (microseconds)"
+                 << "Nearest Spot" << endl;
+            cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
 
-            cout << "Nearest empty spot for your vehicle size" << endl;
-            cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+            vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford"};
+            vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search"};
 
-            // Measure time for the linear search approach
-            start = chrono::high_resolution_clock::now();
-            vector<array<int, 2>> emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
-            nearestSpot = findNearestSpotUsingDijkastras(emptySpotsLinear, entrance);
-            end = chrono::high_resolution_clock::now();
-            auto durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
-            cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
+            array<int, 2> nearestSpot;
+            for (int i = 0; i < 4; i++)
+            {
 
-            // // Display the nearest spot
-            cout << "Nearest empty spot for your vehicle size:" << endl;
-            cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+                vector<array<int, 2>> emptySpots;
 
-            cout << endl;
-            cout << "Using bellman Ford" << endl;
-            // Using binary serach
-            start = chrono::high_resolution_clock::now();
-            emptySpotsBinary = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
-            nearestSpot = findNearestSpotBellmanFord(emptySpotsBinary, entrance);
-            end = chrono::high_resolution_clock::now();
-            durationBinary = chrono::duration_cast<chrono::microseconds>(end - start);
-            cout << "Time taken for binary search approach: " << durationBinary.count() << " microseconds" << endl;
+                auto start = chrono::high_resolution_clock::now();
 
-            cout << "Nearest empty spot for your vehicle size:" << endl;
-            cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+                if (i < 2)
+                {
+                    emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpots(vehicleSize);
+                    nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
+                }
+                else
+                {
+                    emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpots(vehicleSize);
+                    nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
+                }
 
-            // using Linear search
-            start = chrono::high_resolution_clock::now();
-            emptySpotsLinear = parkingLot.filterEmptySpots(vehicleSize);
-            nearestSpot = findNearestSpotBellmanFord(emptySpotsLinear, entrance);
-            end = chrono::high_resolution_clock::now();
-            durationLinear = chrono::duration_cast<chrono::microseconds>(end - start);
-            cout << "Time taken for linear search approach: " << durationLinear.count() << " microseconds" << endl;
+                auto end = chrono::high_resolution_clock::now();
+                auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
 
-            cout << "Nearest empty spot for your vehicle size" << endl;
-            cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+                cout << setw(15) << algorithms[i] << setw(15) << approaches[i] << setw(23) << duration.count();
+                cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+            }
+
             parkingLot.printSpotSizesAfterAllocation(nearestSpot);
-            parkingLot.occupySpot(nearestSpot[0], nearestSpot[1]);
-            parkingLot.saveOccupancyStatusToFile();
         }
         catch (const exception &e)
         {
