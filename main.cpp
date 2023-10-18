@@ -91,12 +91,13 @@ public:
         cout << "This is the view of parking lot with entry point as 1st row and 1st column" << endl;
         for (int i = 0; i < rows; i++)
         {
+            cout << "           ";
             for (int j = 0; j < columns; j++)
             {
                 // Assuming lot[i][j]->occupied contains the spot size
                 cout << "+---";
             }
-            cout << "+\n";
+            cout << "+\n           ";
 
             for (int j = 0; j < columns; j++)
             {
@@ -104,7 +105,7 @@ public:
             }
             cout << "|\n";
         }
-
+        cout << "           ";
         // Print the bottom border of the grid
         for (int j = 0; j < columns; j++)
         {
@@ -116,12 +117,13 @@ public:
     {
         for (int i = 0; i < rows; i++)
         {
+            cout << "           ";
             for (int j = 0; j < columns; j++)
             {
                 // Print the top border of each cell
                 cout << "+---";
             }
-            cout << "+\n";
+            cout << "+\n           ";
 
             for (int j = 0; j < columns; j++)
             {
@@ -141,6 +143,7 @@ public:
         }
 
         // Print the bottom border of the grid after all rows
+        cout << "           ";
         for (int j = 0; j < columns; j++)
         {
             cout << "+---";
@@ -149,8 +152,10 @@ public:
     }
 
     // to mark to spot as occupied
-    void occupySpot(int row, int col)
+    void occupySpot(array<int, 2> &nearestSpot)
     {
+        int row = nearestSpot[0];
+        int col = nearestSpot[1];
         if (row >= 0 && row < rows && col >= 0 && col < columns)
         {
             lot[row][col]->occupied = 1;
@@ -431,6 +436,8 @@ public:
             }
 
             parkingLot.printSpotSizesAfterAllocation(nearestSpot);
+            parkingLot.occupySpot(nearestSpot);
+            parkingLot.saveOccupancyStatusToFile();
         }
         catch (const exception &e)
         {
