@@ -54,8 +54,8 @@ public:
         }
 
         // Read occupancy status and initialize the parking lot
-        rows = 20;    // You can adjust this based on your file structure
-        columns = 20; // You can adjust this based on your file structure
+        rows = 15;    // You can adjust this based on your file structure
+        columns = 15; // You can adjust this based on your file structure
 
         lot = new ParkingSpot **[rows];
         for (int i = 0; i < rows; i++)
@@ -67,11 +67,11 @@ public:
                 file >> occupancy_status;
 
                 char size;
-                if (j >= 0 && j <= 6)
+                if (j >= 0 && j <= 5)
                 {
                     size = 'S';
                 }
-                else if (j >= 7 && j <= 15)
+                else if (j >= 6 && j <= 11)
                 {
                     size = 'M';
                 }
@@ -248,7 +248,7 @@ public:
                         tleft--;
                     }
                     int tright = mid + 1;
-                    while (tright < 20 && lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0)
+                    while (tright < 15 && lot[i][tright]->size == vehicleSize && lot[i][tright]->occupied == 0)
                     {
                         array<int, 2> coords = {i, tright};
                         emptySpots.push_back(coords);
@@ -296,7 +296,7 @@ array<int, 2> findNearestSpotUsingDijkastras(const vector<array<int, 2>> &emptyS
 {
     // Create a priority queue for Dijkstra's algorithm
     priority_queue<pair<int, array<int, 2>>> pq;
-    vector<vector<int>> distance(20, vector<int>(20, INT_MAX));
+    vector<vector<int>> distance(15, vector<int>(15, INT_MAX));
 
     // Initialize the distance for the entrance
     distance[entrance[0]][entrance[1]] = 0;
@@ -338,7 +338,7 @@ array<int, 2> findNearestSpotUsingDijkastras(const vector<array<int, 2>> &emptyS
 
 array<int, 2> findNearestSpotBellmanFord(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
 {
-    vector<vector<int>> distance(20, vector<int>(20, INT_MAX));
+    vector<vector<int>> distance(15, vector<int>(15, INT_MAX));
 
     // Initialize the distance for the entrance
     distance[entrance[0]][entrance[1]] = 0;
@@ -386,7 +386,7 @@ public:
     {
         try
         {
-            // Create a 20x20 parking lot with occupancy status read from the file
+            // Create a 15x15 parking lot with occupancy status read from the file
             ParkingLot parkingLot;
             parkingLot.printSpotSizes();
             // Take user input for vehicle size
