@@ -392,54 +392,58 @@ public:
     // Member function to encapsulate your main logic
     void showAnalyticalView(const char &vehicleSize)
     {
-        try
+
+        array<int, 2> entrance = {0, 0};
+
+        // Define table headers
+        cout << "\n\n"
+             << left << setw(15) << "Algorithm" << setw(15) << "Approach" << setw(23) << "Time (microseconds)"
+             << "Nearest Spot" << endl;
+        cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
+
+        vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford"};
+        vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search"};
+
+        array<int, 2> nearestSpot;
+        for (int i = 0; i < 4; i++)
         {
-            array<int, 2> entrance = {0, 0};
 
-            // Define table headers
-            cout << "\n\n"
-                 << left << setw(15) << "Algorithm" << setw(15) << "Approach" << setw(23) << "Time (microseconds)"
-                 << "Nearest Spot" << endl;
-            cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
+            vector<array<int, 2>> emptySpots;
 
-            vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford"};
-            vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search"};
+            auto start = chrono::high_resolution_clock::now();
 
-            array<int, 2> nearestSpot;
-            for (int i = 0; i < 4; i++)
+            if (i < 2)
             {
-
-                vector<array<int, 2>> emptySpots;
-
-                auto start = chrono::high_resolution_clock::now();
-
-                if (i < 2)
+                emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+                if (emptySpots.empty())
                 {
-                    emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
-                    nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
-                }
-                else
-                {
-                    emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
-                    nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
+                    throw runtime_error("Sorry, no spot available.");
                 }
 
-                auto end = chrono::high_resolution_clock::now();
-                auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
-
-                cout << setw(15) << algorithms[i] << setw(15) << approaches[i] << setw(23) << duration.count();
-                cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
+                nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
             }
-            cout << "\n\n"
-                 << endl;
+            else
+            {
+                emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+                if (emptySpots.empty())
+                {
+                    throw runtime_error("Sorry, no spot available.");
+                }
+                nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
+            }
+
+            auto end = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
+
+            cout << setw(15) << algorithms[i] << setw(15) << approaches[i] << setw(23) << duration.count();
+            cout << "Row: " << nearestSpot[0] + 1 << ", Column: " << nearestSpot[1] + 1 << endl;
         }
-        catch (const exception &e)
-        {
-            cerr << "Error: " << e.what() << endl;
-        }
+        cout << "\n\n"
+             << endl;
     }
     void findClosestSpot(const char &vehicleSize)
     {
+
         int option = 0;
         cout << "Choose a combination to find the closest point" << endl;
         cout << "1. Dikjkastras with Linear Search" << endl;
@@ -455,18 +459,34 @@ public:
         {
         case 1:
             emptySpots = parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
             nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
             break;
         case 2:
             emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
             nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
             break;
         case 3:
             emptySpots = parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
             nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
             break;
         case 4:
             emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
             nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
             break;
 
@@ -492,8 +512,15 @@ int main()
     char vehicleSize;
     cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
     cin >> vehicleSize;
-    manager.findClosestSpot(vehicleSize);
-    manager.showAnalyticalView(vehicleSize);
+    try
+    {
+        manager.findClosestSpot(vehicleSize);
+        manager.showAnalyticalView(vehicleSize);
+    }
+    catch (const exception &e)
+    {
+        cerr << e.what() << endl;
+    }
 
     return 0;
 }
