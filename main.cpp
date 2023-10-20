@@ -96,13 +96,22 @@ public:
             for (int j = 0; j < columns; j++)
             {
                 // Assuming lot[i][j]->occupied contains the spot size
-                cout << "+---";
+                cout << "+----";
             }
             cout << "+\n           ";
 
             for (int j = 0; j < columns; j++)
             {
-                cout << "| " << lot[i][j]->occupied << " ";
+                if (lot[i][j]->occupied == 0)
+                {
+                    cout << "|\x1b[32m" << lot[i][j]->occupied << "(" << lot[i][j]->size << ")"
+                         << "\x1b[0m";
+                }
+                else
+                {
+                    cout << "|" << lot[i][j]->occupied << "(" << lot[i][j]->size << ")"
+                         << "";
+                }
             }
             cout << "|\n";
         }
@@ -110,7 +119,7 @@ public:
         // Print the bottom border of the grid
         for (int j = 0; j < columns; j++)
         {
-            cout << "+---";
+            cout << "+----";
         }
         cout << "+\n";
     }
