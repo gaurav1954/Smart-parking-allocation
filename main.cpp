@@ -449,6 +449,8 @@ public:
         }
         cout << "\n\n"
              << endl;
+        parkingLot.occupySpot(nearestSpot);
+        parkingLot.saveOccupancyStatusToFile();
     }
     void findClosestSpot(const char &vehicleSize)
     {
@@ -509,27 +511,85 @@ public:
              << endl;
         parkingLot.printSpotSizes();
         parkingLot.printSpotSizesAfterAllocation(nearestSpot);
-        parkingLot.occupySpot(nearestSpot);
-        parkingLot.saveOccupancyStatusToFile();
+    }
+    void enterParkingSpot(const char &vehicleSize)
+    {
+        try
+        {
+            findClosestSpot(vehicleSize);
+            showAnalyticalView(vehicleSize);
+        }
+        catch (const exception &e)
+        {
+            cerr << e.what() << endl;
+        }
+    }
+
+    // Function to handle leaving the parking spot
+    void leaveParkingSpot()
+    {
+        int row, col;
+        cout << "Enter the row number of the parking spot you want to leave: ";
+        cin >> row;
+
+        cout << "Enter the column number of the parking spot you want to leave: ";
+        cin >> col;
+
+        array<int, 2> spotToLeave = {row - 1, col - 1};
+
+        if (row >= 1 && row <= 15 && col >= 1 && col <= 15)
+        {
+            parkingLot.lot[spotToLeave[0]][spotToLeave[1]]->occupied = 0;
+            cout << "Parking spot at Row: " << row << ", Column: " << col << " has been marked as vacant." << endl;
+            parkingLot.saveOccupancyStatusToFile();
+        }
+        else
+        {
+            cerr << "Invalid spot coordinates." << endl;
+        }
+    }
+
+    // Main menu function
+    void runMenu()
+    {
+        char option;
+        char vehicleSize;
+
+        cout << "\nMenu:\n";
+        cout << "1. Enter parking spot\n";
+        cout << "2. Leave parking spot\n";
+        cout << "3. Exit\n";
+        cout << "Enter your option: ";
+        cin >> option;
+
+        switch (option)
+        {
+        case '1':
+            cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
+            cin >> vehicleSize;
+            enterParkingSpot(vehicleSize);
+            break;
+
+        case '2':
+            leaveParkingSpot();
+            break;
+
+        case '3':
+            cout << "Exiting the program.\n";
+            break;
+
+        default:
+            cout << "Invalid option. Please try again.\n";
+            break;
+        }
     }
 };
 
 int main()
 {
-    // Instantiate ParkingLotManager and run the main logic
+    // Instantiate ParkingLotManager and run the main menu
     ParkingLotManager manager;
-    char vehicleSize;
-    cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
-    cin >> vehicleSize;
-    try
-    {
-        manager.findClosestSpot(vehicleSize);
-        manager.showAnalyticalView(vehicleSize);
-    }
-    catch (const exception &e)
-    {
-        cerr << e.what() << endl;
-    }
+    manager.runMenu();
 
     return 0;
 }
