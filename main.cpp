@@ -86,7 +86,7 @@ public:
         file.close(); // Close the file
     }
 
-    void printSpotSizes()
+    void printSpotSizes(char s)
     {
         cout << "\n\nThis is the view of parking lot with entry point as 1st row and 1st column" << endl;
         cout << "\n All the 1's represent filled spots and all the 0's represent vacant spots" << endl;
@@ -102,7 +102,7 @@ public:
 
             for (int j = 0; j < columns; j++)
             {
-                if (lot[i][j]->occupied == 0)
+                if (lot[i][j]->occupied == 0 && lot[i][j]->size == s)
                 {
                     cout << "|\x1b[32m" << lot[i][j]->occupied << "(" << lot[i][j]->size << ")"
                          << "\x1b[0m";
@@ -509,7 +509,7 @@ public:
              << " and column number "
              << "\x1b[32m" << nearestSpot[1] + 1 << "\x1b[0m "
              << endl;
-        parkingLot.printSpotSizes();
+        parkingLot.printSpotSizes(vehicleSize);
         parkingLot.printSpotSizesAfterAllocation(nearestSpot);
     }
     void enterParkingSpot(const char &vehicleSize)
