@@ -394,6 +394,50 @@ array<int, 2> findNearestSpotBellmanFord(const vector<array<int, 2>> &emptySpots
     return nearestSpot;
 }
 
+array<int, 2> findNearestSpotUsingAStar(const vector<array<int, 2>> &emptySpots, const array<int, 2> &entrance)
+{
+    // Create a priority queue for A* algorithm
+    priority_queue<pair<int, array<int, 2>>, vector<pair<int, array<int, 2>>>, greater<pair<int, array<int, 2>>>> pq;
+    vector<vector<int>> distance(15, vector<int>(15, INT_MAX));
+
+    // Initialize the distance for the entrance
+    distance[entrance[0]][entrance[1]] = 0;
+    pq.push({0, entrance});
+
+    // A* algorithm to find the nearest spot
+    while (!pq.empty())
+    {
+        array<int, 2> current = pq.top().second;
+        pq.pop();
+
+        for (const auto &spot : emptySpots)
+        {
+            int newDistance = distance[current[0]][current[1]] + manhattanDistance(current, spot) + manhattanDistance(spot, entrance);
+
+            if (newDistance < distance[spot[0]][spot[1]])
+            {
+                distance[spot[0]][spot[1]] = newDistance;
+                pq.push({newDistance, spot});
+            }
+        }
+    }
+
+    // Find the nearest spot
+    int minDistance = INT_MAX;
+    array<int, 2> nearestSpot;
+
+    for (const auto &spot : emptySpots)
+    {
+        if (distance[spot[0]][spot[1]] < minDistance)
+        {
+            minDistance = distance[spot[0]][spot[1]];
+            nearestSpot = spot;
+        }
+    }
+
+    return nearestSpot;
+}
+
 class ParkingLotManager
 {
 public:
@@ -401,7 +445,6 @@ public:
     // Member function to encapsulate your main logic
     void showAnalyticalView(const char &vehicleSize)
     {
-
         array<int, 2> entrance = {0, 0};
 
         // Define table headers
@@ -410,36 +453,32 @@ public:
              << "Nearest Spot" << endl;
         cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
 
-        vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford"};
-        vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search"};
+        vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford", "A*"};
+        vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search", "Binary Search"};
 
         array<int, 2> nearestSpot;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 5; i++)
         {
 
             vector<array<int, 2>> emptySpots;
 
             auto start = chrono::high_resolution_clock::now();
 
+            emptySpots = (i % 2 == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
             if (i < 2)
             {
-                emptySpots = (i == 0) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
-                if (emptySpots.empty())
-                {
-                    throw runtime_error("Sorry, no spot available.");
-                }
-
+                nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
+            }
+            else if (i < 4)
+            {
                 nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
             }
             else
-            {
-                emptySpots = (i == 2) ? parkingLot.filterEmptySpotsBinarySearch(vehicleSize) : parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
-                if (emptySpots.empty())
-                {
-                    throw runtime_error("Sorry, no spot available.");
-                }
-                nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
-            }
+                nearestSpot = findNearestSpotUsingAStar(emptySpots, entrance);
 
             auto end = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
@@ -461,6 +500,7 @@ public:
         cout << "2. Dikjkastras with Binary Search" << endl;
         cout << "3. Bellman Ford with Linear Search" << endl;
         cout << "4. Bellman Ford with Binary Search" << endl;
+        cout << "5. A* algorithm" << endl;
         cout << "Enter your option:";
         cin >> option;
         array<int, 2> entrance = {0, 0};
@@ -500,7 +540,14 @@ public:
             }
             nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
             break;
-
+        case 5: // New case for A* algorithm
+            emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
+            nearestSpot = findNearestSpotUsingAStar(emptySpots, entrance);
+            break;
         default:
             cout << "Invalid option. Please select a valid combination." << endl;
         }
