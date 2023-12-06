@@ -453,11 +453,11 @@ public:
              << "Nearest Spot" << endl;
         cout << setfill('-') << setw(68) << "" << setfill(' ') << endl;
 
-        vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford", "A*"};
-        vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search", "Binary Search"};
+        vector<string> algorithms = {"Dijkstra's", "Dijkstra's", "Bellman-Ford", "Bellman-Ford", "A*", "A*"};
+        vector<string> approaches = {"Binary Search", "Linear Search", "Binary Search", "Linear Search", "Binary Search", "Linear Search"};
 
         array<int, 2> nearestSpot;
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
         {
 
             vector<array<int, 2>> emptySpots;
@@ -475,7 +475,7 @@ public:
             }
             else if (i < 4)
             {
-                nearestSpot = findNearestSpotUsingDijkastras(emptySpots, entrance);
+                nearestSpot = findNearestSpotBellmanFord(emptySpots, entrance);
             }
             else
                 nearestSpot = findNearestSpotUsingAStar(emptySpots, entrance);
@@ -495,12 +495,13 @@ public:
     {
 
         int option = 0;
-        cout << "Choose a combination to find the closest point" << endl;
+        cout << "\nChoose a combination to find the closest point" << endl;
         cout << "1. Dikjkastras with Linear Search" << endl;
         cout << "2. Dikjkastras with Binary Search" << endl;
         cout << "3. Bellman Ford with Linear Search" << endl;
         cout << "4. Bellman Ford with Binary Search" << endl;
-        cout << "5. A* algorithm" << endl;
+        cout << "5. A* algorithm with Linear Search" << endl;
+        cout << "6. A* algorithm with Binary Search" << endl;
         cout << "Enter your option:";
         cin >> option;
         array<int, 2> entrance = {0, 0};
@@ -542,6 +543,13 @@ public:
             break;
         case 5: // New case for A* algorithm
             emptySpots = parkingLot.filterEmptySpotsBinarySearch(vehicleSize);
+            if (emptySpots.empty())
+            {
+                throw runtime_error("Sorry, no spot available.");
+            }
+            nearestSpot = findNearestSpotUsingAStar(emptySpots, entrance);
+        case 6: // New case for A* algorithm
+            emptySpots = parkingLot.filterEmptySpotsUsingLinearSeach(vehicleSize);
             if (emptySpots.empty())
             {
                 throw runtime_error("Sorry, no spot available.");
@@ -612,7 +620,7 @@ public:
         switch (option)
         {
         case '1':
-            cout << "Enter your vehicle size (S for small, M for medium, L for large): ";
+            cout << "\nS->two wheerlers\nM->Cars\nL->trucks\nEnter your vehicle size: ";
             cin >> vehicleSize;
             enterParkingSpot(vehicleSize);
             break;
